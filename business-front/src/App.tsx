@@ -1,14 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
+import Layout from './layout';
+import LoginPage from './pages/LoginPage';
+import HomePage from './pages/HomePage';
 import './App.css'
-import { Button } from './components/ui/button'
+
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  return (
-    <>
-      <Button>Click me!</Button>
-    </>
-  )
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    setIsAuthenticated(!!token);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    // You can return a loading spinner here
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return (
+      <Layout>
+        <HomePage />
+      </Layout>
+    );
+  }
+
+  return <LoginPage />;
 }
 
-export default App
+export default App;
