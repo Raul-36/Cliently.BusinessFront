@@ -21,8 +21,18 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed. Please check your credentials.");
+        const text = await response.text(); 
+
+        let errorMessage = "Login failed.";
+
+        try {
+          const json = JSON.parse(text); 
+          errorMessage = json.message || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage; 
+        }
+
+        setError(errorMessage);
         return;
       }
 
