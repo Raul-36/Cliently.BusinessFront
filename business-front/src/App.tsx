@@ -1,34 +1,32 @@
-import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Layout from './layout';
 import LoginPage from './pages/LoginPage';
+import RegistrationPage from './pages/RegistrationPage';
 import HomePage from './pages/HomePage';
-import './App.css'
-
+import ProtectedRoute from './components/ProtectedRoute';
+import RedirectIfAuth from './components/RedirectIfAuth';
+import './App.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  return (
+    <Routes>
+      {/* Public routes that should redirect if user is authenticated */}
+      <Route element={<RedirectIfAuth />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationPage />} />
+      </Route>
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    setIsAuthenticated(!!token);
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
-    // You can return a loading spinner here
-    return <div>Loading...</div>;
-  }
-
-  if (isAuthenticated) {
-    return (
-      <Layout>
-        <HomePage />
-      </Layout>
-    );
-  }
-
-  return <LoginPage />;
+      {/* Protected routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={
+          <Layout>
+            <HomePage />
+          </Layout>
+        } />
+        {/* Add other protected routes here */}
+      </Route>
+    </Routes>
+  );
 }
 
 export default App;

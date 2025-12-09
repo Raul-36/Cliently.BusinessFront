@@ -4,17 +4,23 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
-export default function LoginPage() {
+export default function RegistrationPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    setError(null);
+  const handleRegister = async () => {
+    setErrors([]);
+
+    if (password !== confirmPassword) {
+      setErrors(["Passwords do not match."]);
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:8080/api/identity/Identity/signin", {
+      const response = await fetch("http://localhost:8080/api/identity/Identity/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -23,28 +29,22 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        const text = await response.text();
-
-        let errorMessage = "Login failed.";
-
-        try {
-          const json = JSON.parse(text);
-          errorMessage = json.message || errorMessage;
-        } catch {
-          errorMessage = text || errorMessage;
+        const errorData = await response.json();
+        if (Array.isArray(errorData)) {
+          setErrors(errorData);
+        } else {
+          setErrors(["An unknown registration error occurred."]);
         }
-
-        setError(errorMessage);
         return;
       }
 
       const data = await response.json();
       localStorage.setItem('authToken', data.token);
       navigate('/');
-      window.location.reload();
+      window.location.reload(); // still reload to make sure App.tsx re-evaluates auth
     } catch (err) {
-      console.error("Login API call failed:", err);
-      setError("Network error or server unavailable.");
+      console.error("Registration API call failed:", err);
+      setErrors(["Network error or server unavailable."]);
     }
   };
 
@@ -52,9 +52,9 @@ export default function LoginPage() {
     <div className="flex h-screen w-full items-center justify-center bg-background">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Register</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Create a new account.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -63,7 +63,7 @@ export default function LoginPage() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
+              placeholder="user@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -79,14 +79,30 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          <div className="grid gap-2">
+            <label htmlFor="confirm-password">Confirm Password</label>
+            <Input
+              id="confirm-password"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+          {errors.length > 0 && (
+            <div className="text-sm text-red-500">
+              {errors.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex-col gap-4">
-          <Button className="w-full" onClick={handleLogin}>Sign in</Button>
+          <Button className="w-full" onClick={handleRegister}>Register</Button>
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline">
-              Sign up
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary hover:underline">
+              Sign in
             </Link>
           </p>
         </CardFooter>
