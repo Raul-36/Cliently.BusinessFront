@@ -1,0 +1,221 @@
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+// Import Dialog components
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
+import { useBusiness } from "@/contexts/BusinessContext";
+import { decodeJwt } from "@/lib/jwt"; // Import decodeJwt
+
+export default function SettingsPage() {
+  const { business, loading, error } = useBusiness();
+  const [deleteBusinessError, setDeleteBusinessError] = useState<string | null>(null); // Renamed for clarity
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null); // New state for account deletion errors
+  const navigate = useNavigate();
+  const dialogBusinessCloseRef = useRef<HTMLButtonElement>(null); // Ref for business dialog
+  const dialogAccountCloseRef = useRef<HTMLButtonElement>(null); // Ref for account dialog
+
+
+  const handleDeleteBusiness = async () => {
+    setDeleteBusinessError(null);
+
+    if (!business || !business.id) {
+      setDeleteBusinessError("No business found to delete.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setDeleteBusinessError("Authentication token missing. Please log in.");
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8080/api/business/Businesses/${business.id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 204) {
+        // Successfully deleted, log out the user
+        localStorage.removeItem('authToken');
+        navigate('/login');
+        window.location.reload();
+      } else {
+        const text = await response.text();
+        let errorMessage = "Failed to delete business.";
+        try {
+          const json = JSON.parse(text);
+          errorMessage = json.message || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage;
+        }
+        setDeleteBusinessError(errorMessage);
+        if (dialogBusinessCloseRef.current) {
+            dialogBusinessCloseRef.current.click(); // Close dialog on error as well
+        }
+      }
+    } catch (err: any) {
+      console.error("Delete Business API call failed:", err);
+      setDeleteBusinessError(err.message || "Network error or server unavailable.");
+      if (dialogBusinessCloseRef.current) {
+          dialogBusinessCloseRef.current.click(); // Close dialog on network error
+      }
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteAccountError(null);
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setDeleteAccountError("Authentication token missing. Please log in.");
+        navigate('/login');
+        return;
+      }
+
+      const decodedToken = decodeJwt(token);
+      const userId = decodedToken?.sub; // 'sub' claim holds the user ID
+
+      if (!userId) {
+        setDeleteAccountError("User ID not found in token.");
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8080/api/identity/Users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 204) {
+        // Successfully deleted, log out the user
+        localStorage.removeItem('authToken');
+        navigate('/login');
+        window.location.reload();
+      } else {
+        const text = await response.text();
+        let errorMessage = "Failed to delete account.";
+        try {
+          const json = JSON.parse(text);
+          errorMessage = json.message || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage;
+        }
+        setDeleteAccountError(errorMessage);
+        if (dialogAccountCloseRef.current) {
+            dialogAccountCloseRef.current.click(); // Close dialog on error
+        }
+      }
+    } catch (err: any) {
+      console.error("Delete Account API call failed:", err);
+      setDeleteAccountError(err.message || "Network error or server unavailable.");
+      if (dialogAccountCloseRef.current) {
+          dialogAccountCloseRef.current.click(); // Close dialog on network error
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="p-4 text-center">Loading settings...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">Error: {error}</div>;
+  }
+
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center p-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl">Settings</CardTitle>
+          <CardDescription>Manage your application settings.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          {business ? (
+            <div className="flex flex-col gap-2">
+              <h2 className="text-lg font-semibold">Your Business: {business.name}</h2>
+              
+              {/* Dialog for Delete Business Confirmation */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    Delete My Business
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                      This action cannot be undone. This will permanently delete your business &quot;{business.name}&quot; and remove your data from our servers.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button variant="destructive" onClick={handleDeleteBusiness}>
+                      Delete Business
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {deleteBusinessError && <p className="text-sm text-red-500 mt-2">{deleteBusinessError}</p>}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No business associated with your account.</p>
+          )}
+
+          <hr className="my-4" /> {/* Separator */}
+
+          {/* Dialog for Delete Account Confirmation */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="destructive" className="w-full">
+                Delete My Account
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete your account and all associated data, including your business.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button variant="destructive" onClick={handleDeleteAccount}>
+                  Delete Account
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {deleteAccountError && <p className="text-sm text-red-500 mt-2">{deleteAccountError}</p>}
+
+        </CardContent>
+        <CardFooter className="flex-col gap-4">
+            {/* Other settings can go here */}
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}

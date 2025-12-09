@@ -3,8 +3,11 @@ import Layout from './layout';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import HomePage from './pages/HomePage';
+import CreateBusinessPage from './pages/CreateBusinessPage';
+import SettingsPage from './pages/SettingsPage'; // Import SettingsPage
 import ProtectedRoute from './components/ProtectedRoute';
 import RedirectIfAuth from './components/RedirectIfAuth';
+import { BusinessProvider } from './contexts/BusinessContext';
 import './App.css';
 
 function App() {
@@ -19,11 +22,26 @@ function App() {
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={
-          <Layout>
-            <HomePage />
-          </Layout>
+          <BusinessProvider>
+            <Layout>
+              <HomePage />
+            </Layout>
+          </BusinessProvider>
         } />
-        {/* Add other protected routes here */}
+        <Route path="/create-business" element={
+          <BusinessProvider>
+            <Layout>
+              <CreateBusinessPage />
+            </Layout>
+          </BusinessProvider>
+        } />
+        <Route path="/settings" element={
+          <BusinessProvider>
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          </BusinessProvider>
+        } />
       </Route>
     </Routes>
   );
