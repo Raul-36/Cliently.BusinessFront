@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { authFetch } from "@/lib/api"; 
 
 export default function CreateBusinessPage() {
   const [businessName, setBusinessName] = useState("");
@@ -13,41 +14,34 @@ export default function CreateBusinessPage() {
     setErrors([]);
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        setErrors(["No authentication token found. Please log in."]);
-        navigate('/login');
-        return;
-      }
-
-      const response = await fetch("http://localhost:8080/api/business/Businesses", {
+      const response = await authFetch("http://localhost:8080/api/business/Businesses", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ name: businessName }),
-      });
+      }, navigate); 
 
       if (!response.ok) {
-        const errorData = await response.json();
-        if (Array.isArray(errorData)) {
-          setErrors(errorData);
-        } else if (errorData && errorData.message) {
-          setErrors([errorData.message]);
+        const text = await response.text();
+        let errorMessage = "Failed to create business.";
+        try {
+          const json = JSON.parse(text);
+          errorMessage = json.message || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage;
         }
-        else {
-          setErrors(["An unknown error occurred during business creation."]);
-        }
+        setErrors([errorMessage]);
         return;
       }
 
-      // Business created successfully, navigate to home and reload to refresh context
+      
       navigate('/');
       window.location.reload();
-    } catch (err: any) {
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Unauthorized') {
+        
+        return;
+      }
       console.error("Create Business API call failed:", err);
-      setErrors([err.message || "Network error or server unavailable."]);
+      setErrors(["Network error or server unavailable."]);
     }
   };
 

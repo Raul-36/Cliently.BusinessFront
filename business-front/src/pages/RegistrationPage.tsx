@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { authFetch } from "@/lib/api"; 
 
 export default function RegistrationPage() {
   const [email, setEmail] = useState("");
@@ -20,13 +21,10 @@ export default function RegistrationPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/identity/Identity/register", {
+      const response = await authFetch("http://localhost:8080/api/identity/Identity/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ email, password }),
-      });
+      }, navigate); 
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -41,8 +39,11 @@ export default function RegistrationPage() {
       const data = await response.json();
       localStorage.setItem('authToken', data.token);
       navigate('/');
-      window.location.reload(); // still reload to make sure App.tsx re-evaluates auth
+      window.location.reload();
     } catch (err) {
+      if (err instanceof Error && err.message === 'Unauthorized') {
+        return;
+      }
       console.error("Registration API call failed:", err);
       setErrors(["Network error or server unavailable."]);
     }

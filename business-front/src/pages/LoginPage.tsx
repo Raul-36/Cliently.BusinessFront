@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { authFetch } from "@/lib/api"; 
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,26 +15,19 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8080/api/identity/Identity/signin", {
+      const response = await authFetch("http://localhost:8080/api/identity/Identity/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ email, password }),
-      });
-
+      }, navigate); 
       if (!response.ok) {
         const text = await response.text();
-
         let errorMessage = "Login failed.";
-
         try {
           const json = JSON.parse(text);
           errorMessage = json.message || errorMessage;
         } catch {
           errorMessage = text || errorMessage;
         }
-
         setError(errorMessage);
         return;
       }
@@ -43,6 +37,9 @@ export default function LoginPage() {
       navigate('/');
       window.location.reload();
     } catch (err) {
+      if (err instanceof Error && err.message === 'Unauthorized') {
+        return;
+      }
       console.error("Login API call failed:", err);
       setError("Network error or server unavailable.");
     }

@@ -17,13 +17,12 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
-import { useBusiness } from "@/contexts/BusinessContext" // Import useBusiness
+import { useBusiness } from "@/contexts/BusinessContext" 
 
-// Static menu items. Dynamic items will be inserted based on business data.
 const staticMenuItems = [
   {
     title: "Home",
-    url: "/", // Corrected URL to navigate to the home page
+    url: "/", 
     icon: Home,
     type: "link"
   },
@@ -37,57 +36,54 @@ const staticMenuItems = [
 
 export function AppSidebar() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
-  const { business, loading, error } = useBusiness(); // Use the business context
-  const navigate = useNavigate(); // Initialize useNavigate
+  const { business, loading, error } = useBusiness(); 
+  const navigate = useNavigate(); 
 
   const handleAccordionClick = (title: string) => {
     setOpenAccordion(openAccordion === title ? null : title)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Remove token from localStorage
-    navigate('/login'); // Redirect to login page
-    window.location.reload(); // Force a full reload to clear all state
+    localStorage.removeItem('authToken'); 
+    navigate('/login'); 
+    window.location.reload();
   };
-
-  // Combine static and dynamic menu items
   const allMenuItems = [...staticMenuItems];
 
   const dynamicItems: any[] = [];
 
-  // Changed conditions to only check for existence of business object and its properties
   if (!loading && !error && business) {
-    if (business.texts) { // Only check if 'texts' array exists
+    if (business.texts) { 
       dynamicItems.push({
         title: "Texts",
         icon: BookText,
         type: "accordion",
         subItems: [
-          { title: "Add New Text", url: "#" }, // Moved to the beginning
+          { title: "Add New Text", url: "#" }, 
           ...business.texts.map(text => ({ title: text.title, url: `#` }))
         ],
       });
     }
 
-    if (business.lists) { // Only check if 'lists' array exists
+    if (business.lists) { 
       dynamicItems.push({
         title: "Lists",
         icon: List,
         type: "accordion",
         subItems: [
-          { title: "Add New List", url: "#" }, // Moved to the beginning
+          { title: "Add New List", url: "#" }, 
           ...business.lists.map(list => ({ title: list.name, url: `#` }))
         ],
       });
     }
   }
 
-  // Find index of 'Home' in staticMenuItems
+  
   const homeIndex = allMenuItems.findIndex(item => item.title === "Home");
   if (homeIndex !== -1) {
     allMenuItems.splice(homeIndex + 1, 0, ...dynamicItems);
   } else {
-    allMenuItems.unshift(...dynamicItems); // If no home, add dynamic items at the beginning
+    allMenuItems.unshift(...dynamicItems); 
   }
 
 

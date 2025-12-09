@@ -1,16 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authFetch } from '@/lib/api';
 
-// Define the types for the business data based on the API response
+type NavigateFunction = ReturnType<typeof useNavigate>;
 interface ShortInfoTextResponse {
   id: string;
   title: string;
-  // Add other properties if available in the DTO
 }
 
 interface InfoListResponse {
   id: string;
   name: string;
-  // Add other properties if available in the DTO
 }
 
 interface BusinessResponse {
@@ -30,9 +30,10 @@ const BusinessContext = createContext<BusinessContextType | undefined>(undefined
 
 interface BusinessProviderProps {
   children: React.ReactNode;
+  navigate: NavigateFunction;
 }
 
-export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children }) => {
+export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children, navigate }) => {
   const [business, setBusiness] = useState<BusinessResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,31 +42,23 @@ export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children }) 
     const fetchBusinessData = async () => {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('authToken');
 
-      if (!token) {
-        setError("No authentication token found.");
+      if (!localStorage.getItem('authToken')) {
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch("http://localhost:8080/api/business/Businesses/byUser", {
+        const response = await authFetch("http://localhost:8080/api/business/Businesses/byUser", {
           method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        }, navigate);
 
         if (response.status === 404) {
-            // No business found for this user, which is a valid scenario.
-            // We can set business to null and clear error.
-            setBusiness(null);
-            setError(null);
-            console.warn("No business found for the current user.");
-            setLoading(false);
-            return;
+          setBusiness(null);
+          setError(null);
+          console.warn("No business found for the current user.");
+          setLoading(false);
+          return;
         }
 
         if (!response.ok) {
@@ -78,6 +71,9 @@ export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children }) 
         const data: BusinessResponse = await response.json();
         setBusiness(data);
       } catch (err) {
+        if (err instanceof Error && err.message === 'Unauthorized') {
+          return;
+        }
         let errorMessage = "Network error or failed to connect to business service.";
         if (err instanceof Error) {
           errorMessage = err.message;
@@ -92,7 +88,7 @@ export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children }) 
     };
 
     fetchBusinessData();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [navigate]);
 
   return (
     <BusinessContext.Provider value={{ business, loading, error }}>

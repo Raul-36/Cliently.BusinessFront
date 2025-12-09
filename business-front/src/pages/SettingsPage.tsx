@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-// Import Dialog components
+
 import {
   Dialog,
   DialogContent,
@@ -14,15 +14,16 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { decodeJwt } from "@/lib/jwt"; // Import decodeJwt
+import { decodeJwt } from "@/lib/jwt"; 
+import { authFetch } from "@/lib/api"; 
 
 export default function SettingsPage() {
   const { business, loading, error } = useBusiness();
-  const [deleteBusinessError, setDeleteBusinessError] = useState<string | null>(null); // Renamed for clarity
-  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null); // New state for account deletion errors
+  const [deleteBusinessError, setDeleteBusinessError] = useState<string | null>(null);
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null); 
   const navigate = useNavigate();
-  const dialogBusinessCloseRef = useRef<HTMLButtonElement>(null); // Ref for business dialog
-  const dialogAccountCloseRef = useRef<HTMLButtonElement>(null); // Ref for account dialog
+  const dialogBusinessCloseRef = useRef<HTMLButtonElement>(null); 
+  const dialogAccountCloseRef = useRef<HTMLButtonElement>(null); 
 
 
   const handleDeleteBusiness = async () => {
@@ -34,23 +35,12 @@ export default function SettingsPage() {
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        setDeleteBusinessError("Authentication token missing. Please log in.");
-        navigate('/login');
-        return;
-      }
-
-      const response = await fetch(`http://localhost:8080/api/business/Businesses/${business.id}`, {
+      const response = await authFetch(`http://localhost:8080/api/business/Businesses/${business.id}`, {
         method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      }, navigate); 
 
       if (response.status === 204) {
-        // Successfully deleted, log out the user
+        
         localStorage.removeItem('authToken');
         navigate('/login');
         window.location.reload();
@@ -65,14 +55,17 @@ export default function SettingsPage() {
         }
         setDeleteBusinessError(errorMessage);
         if (dialogBusinessCloseRef.current) {
-            dialogBusinessCloseRef.current.click(); // Close dialog on error as well
+            dialogBusinessCloseRef.current.click(); 
         }
       }
     } catch (err: any) {
+      if (err instanceof Error && err.message === 'Unauthorized') {
+        return; 
+      }
       console.error("Delete Business API call failed:", err);
       setDeleteBusinessError(err.message || "Network error or server unavailable.");
       if (dialogBusinessCloseRef.current) {
-          dialogBusinessCloseRef.current.click(); // Close dialog on network error
+          dialogBusinessCloseRef.current.click(); 
       }
     }
   };
@@ -89,23 +82,18 @@ export default function SettingsPage() {
       }
 
       const decodedToken = decodeJwt(token);
-      const userId = decodedToken?.sub; // 'sub' claim holds the user ID
+      const userId = decodedToken?.sub; 
 
       if (!userId) {
         setDeleteAccountError("User ID not found in token.");
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/api/identity/Users/${userId}`, {
+      const response = await authFetch(`http://localhost:8080/api/identity/Users/${userId}`, {
         method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      }, navigate); 
 
       if (response.status === 204) {
-        // Successfully deleted, log out the user
         localStorage.removeItem('authToken');
         navigate('/login');
         window.location.reload();
@@ -120,14 +108,17 @@ export default function SettingsPage() {
         }
         setDeleteAccountError(errorMessage);
         if (dialogAccountCloseRef.current) {
-            dialogAccountCloseRef.current.click(); // Close dialog on error
+            dialogAccountCloseRef.current.click(); 
         }
       }
     } catch (err: any) {
+      if (err instanceof Error && err.message === 'Unauthorized') {
+        return; 
+      }
       console.error("Delete Account API call failed:", err);
       setDeleteAccountError(err.message || "Network error or server unavailable.");
       if (dialogAccountCloseRef.current) {
-          dialogAccountCloseRef.current.click(); // Close dialog on network error
+          dialogAccountCloseRef.current.click(); 
       }
     }
   };
@@ -152,7 +143,6 @@ export default function SettingsPage() {
             <div className="flex flex-col gap-2">
               <h2 className="text-lg font-semibold">Your Business: {business.name}</h2>
               
-              {/* Dialog for Delete Business Confirmation */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="destructive" className="w-full">
@@ -183,9 +173,8 @@ export default function SettingsPage() {
             <p className="text-muted-foreground">No business associated with your account.</p>
           )}
 
-          <hr className="my-4" /> {/* Separator */}
+          <hr className="my-4" /> 
 
-          {/* Dialog for Delete Account Confirmation */}
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive" className="w-full">
@@ -213,7 +202,6 @@ export default function SettingsPage() {
 
         </CardContent>
         <CardFooter className="flex-col gap-4">
-            {/* Other settings can go here */}
         </CardFooter>
       </Card>
     </div>

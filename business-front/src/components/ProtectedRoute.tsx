@@ -14,7 +14,7 @@ const ProtectedRoute = () => {
     if (token) {
       const decodedToken = decodeJwt(token);
             console.log("Decoded Token:", decodedToken);
-            const ROLE_CLAIM_TYPE = "role"; // Corrected to "role"
+            const ROLE_CLAIM_TYPE = "role"; 
             const userRoles = decodedToken?.[ROLE_CLAIM_TYPE] || [];      const isAuthorized = Array.isArray(userRoles)
         ? userRoles.includes('User')
         : userRoles === 'User';
@@ -42,10 +42,10 @@ const ProtectedRoute = () => {
   }
 
   if (!authStatus.isAuthorized) {
-    return null; // Render empty page
+    return null; 
   }
 
-  return <Outlet />; // Renders the nested child route
+  return <Outlet />; 
 };
 
 export default ProtectedRoute;
