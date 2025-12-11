@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import CreateBusinessPage from './pages/CreateBusinessPage';
 import CreateTextPage from './pages/texts/CreateTextPage';
 import CreateListPage from './pages/lists/CreateListPage';
+import TextViewPage from './pages/texts/TextViewPage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RedirectIfAuth from './components/RedirectIfAuth';
@@ -49,6 +50,13 @@ function App() {
           <BusinessProvider navigate={navigate}>
             <Layout>
               <CreateListPage />
+            </Layout>
+          </BusinessProvider>
+        } />
+        <Route path="/texts/:id" element={
+          <BusinessProvider navigate={navigate}>
+            <Layout>
+              <TextViewPage />
             </Layout>
           </BusinessProvider>
         } />

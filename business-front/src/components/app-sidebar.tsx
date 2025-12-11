@@ -49,9 +49,7 @@ export function AppSidebar() {
     window.location.reload();
   };
   const allMenuItems = [...staticMenuItems];
-
   const dynamicItems: any[] = [];
-
   if (!loading && !error && business) {
     if (business.texts) { 
       dynamicItems.push({
@@ -59,8 +57,8 @@ export function AppSidebar() {
         icon: BookText,
         type: "accordion",
         subItems: [
-          { title: "Add New Text", url: "/create-text" }, 
-          ...business.texts.map(text => ({ title: text.name, url: `/texts/${text.id}` }))
+          { id: "add-new-text", title: "Add New Text", url: "/create-text" }, 
+          ...business.texts.map(text => ({ id: text.id, title: text.name, url: `/texts/${text.id}` }))
         ],
       });
     }
@@ -71,8 +69,8 @@ export function AppSidebar() {
         icon: List,
         type: "accordion",
         subItems: [
-          { title: "Add New List", url: "/create-list" }, 
-          ...business.lists.map(list => ({ title: list.name, url: `/lists/${list.id}` }))
+          { id: "add-new-list", title: "Add New List", url: "/create-list" }, 
+          ...business.lists.map(list => ({ id: list.id, title: list.name, url: `/lists/${list.id}` }))
         ],
       });
     }
@@ -176,8 +174,8 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                     {openAccordion === item.title && (
                       <SidebarMenuSub>
-                        {item.subItems.map((subItem: {title: string; url: string}) => (
-                          <SidebarMenuSubItem key={subItem.title}>
+                        {item.subItems.map((subItem: {id: string; title: string; url: string}) => (
+                          <SidebarMenuSubItem key={subItem.id}>
                             <SidebarMenuSubButton asChild>
                               <a href={subItem.url}>{subItem.title}</a>
                             </SidebarMenuSubButton>
