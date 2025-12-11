@@ -35,7 +35,8 @@ export default function SettingsPage() {
     }
 
     try {
-      const response = await authFetch(`http://localhost:8080/api/business/Businesses/${business.id}`, {
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const response = await authFetch(`${apiUrl}/api/business/Businesses/${business.id}`, {
         method: "DELETE",
       }, navigate); 
 
@@ -89,7 +90,8 @@ export default function SettingsPage() {
         return;
       }
 
-      const response = await authFetch(`http://localhost:8080/api/identity/Users/${userId}`, {
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const response = await authFetch(`${apiUrl}/api/identity/Users/${userId}`, {
         method: "DELETE",
       }, navigate); 
 

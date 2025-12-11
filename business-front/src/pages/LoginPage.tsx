@@ -15,7 +15,8 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await authFetch("http://localhost:8080/api/identity/Identity/signin", {
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const response = await authFetch(`${apiUrl}/api/identity/Identity/signin`, {
         method: "POST",
         body: JSON.stringify({ email, password }),
       }, navigate); 

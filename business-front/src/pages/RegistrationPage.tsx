@@ -21,7 +21,8 @@ export default function RegistrationPage() {
     }
 
     try {
-      const response = await authFetch("http://localhost:8080/api/identity/Identity/register", {
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const response = await authFetch(`${apiUrl}/api/identity/Identity/register`, {
         method: "POST",
         body: JSON.stringify({ email, password }),
       }, navigate); 

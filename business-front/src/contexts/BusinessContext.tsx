@@ -5,7 +5,7 @@ import { authFetch } from '@/lib/api';
 type NavigateFunction = ReturnType<typeof useNavigate>;
 interface ShortInfoTextResponse {
   id: string;
-  title: string;
+  name: string;
 }
 
 interface InfoListResponse {
@@ -49,7 +49,8 @@ export const BusinessProvider: React.FC<BusinessProviderProps> = ({ children, na
       }
 
       try {
-        const response = await authFetch("http://localhost:8080/api/business/Businesses/byUser", {
+        const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+        const response = await authFetch(`${apiUrl}/api/business/Businesses/byUser`, {
           method: "GET",
         }, navigate);
 

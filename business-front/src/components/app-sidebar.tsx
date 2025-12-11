@@ -59,8 +59,8 @@ export function AppSidebar() {
         icon: BookText,
         type: "accordion",
         subItems: [
-          { title: "Add New Text", url: "#" }, 
-          ...business.texts.map(text => ({ title: text.title, url: `#` }))
+          { title: "Add New Text", url: "/create-text" }, 
+          ...business.texts.map(text => ({ title: text.name, url: `/texts/${text.id}` }))
         ],
       });
     }
@@ -71,8 +71,8 @@ export function AppSidebar() {
         icon: List,
         type: "accordion",
         subItems: [
-          { title: "Add New List", url: "#" }, 
-          ...business.lists.map(list => ({ title: list.name, url: `#` }))
+          { title: "Add New List", url: "/create-list" }, 
+          ...business.lists.map(list => ({ title: list.name, url: `/lists/${list.id}` }))
         ],
       });
     }

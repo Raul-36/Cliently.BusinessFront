@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import HomePage from './pages/HomePage';
 import CreateBusinessPage from './pages/CreateBusinessPage';
+import CreateTextPage from './pages/texts/CreateTextPage';
+import CreateListPage from './pages/lists/CreateListPage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RedirectIfAuth from './components/RedirectIfAuth';
@@ -33,6 +35,20 @@ function App() {
           <BusinessProvider navigate={navigate}> 
             <Layout>
               <CreateBusinessPage />
+            </Layout>
+          </BusinessProvider>
+        } />
+        <Route path="/create-text" element={
+          <BusinessProvider navigate={navigate}>
+            <Layout>
+              <CreateTextPage />
+            </Layout>
+          </BusinessProvider>
+        } />
+        <Route path="/create-list" element={
+          <BusinessProvider navigate={navigate}>
+            <Layout>
+              <CreateListPage />
             </Layout>
           </BusinessProvider>
         } />
