@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom';
 import { useBusiness } from '@/contexts/BusinessContext';
+import TextsDisplayCard from '@/components/TextsDisplayCard';
 
 export default function HomePage() {
   const { business, loading, error } = useBusiness();
@@ -24,23 +25,31 @@ export default function HomePage() {
 
   if (!business) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
-        <h1 className="text-2xl font-bold">Hey, you don't have a business yet!</h1>
-        <p className="mt-2">Let's fix that. Create your business to unlock all features.</p>
-        <Button asChild className="mt-4">
-          <Link to="/create-business">
-            Create New Business
-          </Link>
-        </Button>
+      <div className="relative flex-1">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pt-[20vh] mt-24 text-center">
+          <h1 className="text-2xl font-bold">
+            Hey, you don't have a business yet!
+          </h1>
+          <p className="mt-2">
+            Let's fix that. Create your business to unlock all features.
+          </p>
+          <Button asChild className="mt-4">
+            <Link to="/create-business">Create New Business</Link>
+          </Button>
+        </div>
       </div>
+
+
     );
   }
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Welcome, {business.name}!</h1>
-      <p>You are logged in. The sidebar is visible and populated with your business data.</p>
-      <Button>Click me!</Button>
-    </div>
-  );
+        return (
+
+          <div className="px-4 pt-8 flex flex-col gap-4 flex-grow">
+
+            <TextsDisplayCard texts={business.texts} />
+
+          </div>
+
+        );
 }

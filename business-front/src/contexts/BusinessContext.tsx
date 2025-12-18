@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authFetch } from '@/lib/api';
 
 type NavigateFunction = ReturnType<typeof useNavigate>;
-interface ShortInfoTextResponse {
+export interface ShortInfoTextResponse {
   id: string;
   name: string;
 }
