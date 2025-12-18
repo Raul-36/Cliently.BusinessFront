@@ -59,7 +59,7 @@ export default function CreateTextPage() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
-      <Card className="w-full max-w-lg">
+      <Card className="w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-2xl">Create New Text</CardTitle>
           <CardDescription>
@@ -86,6 +86,7 @@ export default function CreateTextPage() {
               required
               value={text}
               onChange={(e) => setText(e.target.value)}
+              className="min-h-[300px]"
             />
           </div>
           {errors.length > 0 && (
