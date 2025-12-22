@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { BookText, ChevronDown, List, Settings, Home, LogOut } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import {
   Sidebar,
@@ -184,20 +184,19 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                     {openAccordion === item.title && (
                       <SidebarMenuSub>
-                        {item.subItems.map((subItem: { id: string; title: string; url: string }) => (
+                        {item.subItems.map((subItem: { id: string; title: string; url: string; isCreate?: boolean }) => (
                           <SidebarMenuSubItem key={subItem.id}>
                             <SidebarMenuSubButton asChild>
-                              <a
-                                href={subItem.url}
+                              <Link
+                                to={subItem.url}
                                 className={cn(
                                   subItem.isCreate &&
-                                  "text-green-600 hover:text-green-700 font-medium"
+                                  "!text-green-600 hover:!text-green-700 font-medium"
                                 )}
                               >
                                 {subItem.title}
-                              </a>
+                              </Link>
                             </SidebarMenuSubButton>
-
                           </SidebarMenuSubItem>
                         ))}
                       </SidebarMenuSub>
@@ -206,10 +205,10 @@ export function AppSidebar() {
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <a href={item.url}>
+                      <Link to={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
@@ -230,4 +229,5 @@ export function AppSidebar() {
       </SidebarFooter>
     </Sidebar>
   )
-} 
+}
+ 

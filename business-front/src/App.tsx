@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import CreateBusinessPage from './pages/CreateBusinessPage';
 import CreateTextPage from './pages/texts/CreateTextPage';
 import CreateListPage from './pages/lists/CreateListPage';
+import ListViewPage from './pages/lists/ListViewPage';
 import TextViewPage from './pages/texts/TextViewPage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -57,6 +58,13 @@ function App() {
           <BusinessProvider navigate={navigate}>
             <Layout>
               <TextViewPage />
+            </Layout>
+          </BusinessProvider>
+        } />
+        <Route path="/lists/:listId" element={
+          <BusinessProvider navigate={navigate}>
+            <Layout>
+              <ListViewPage />
             </Layout>
           </BusinessProvider>
         } />
