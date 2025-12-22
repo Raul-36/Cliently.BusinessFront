@@ -53,8 +53,8 @@ export function AppSidebar() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken')
-    navigate('/login')
+    localStorage.removeItem("authToken")
+    navigate("/login")
     window.location.reload()
   }
 
@@ -107,16 +107,28 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton><Home /><span>Home</span></SidebarMenuButton>
+                  <SidebarMenuButton>
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuSubButton><BookText /><span>Loading Texts...</span></SidebarMenuSubButton>
+                  <SidebarMenuSubButton>
+                    <BookText />
+                    <span>Loading Texts...</span>
+                  </SidebarMenuSubButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuSubButton><List /><span>Loading Lists...</span></SidebarMenuSubButton>
+                  <SidebarMenuSubButton>
+                    <List />
+                    <span>Loading Lists...</span>
+                  </SidebarMenuSubButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton><Settings /><span>Settings</span></SidebarMenuButton>
+                  <SidebarMenuButton>
+                    <Settings />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
@@ -125,7 +137,10 @@ export function AppSidebar() {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout}><LogOut /><span>Logout</span></SidebarMenuButton>
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut />
+                <span>Logout</span>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
@@ -143,11 +158,19 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton><Home /><span>Home</span></SidebarMenuButton>
+                  <SidebarMenuButton>
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem><p className="text-red-500 p-2">Error: {error}</p></SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton><Settings /><span>Settings</span></SidebarMenuButton>
+                  <p className="text-red-500 p-2">Error: {error}</p>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Settings />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
@@ -156,7 +179,10 @@ export function AppSidebar() {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout}><LogOut /><span>Logout</span></SidebarMenuButton>
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut />
+                <span>Logout</span>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
@@ -172,45 +198,51 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {allMenuItems.map(item =>
-                isAccordion(item) ? (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      onClick={() => handleAccordionClick(item.title)}
-                      data-state={openAccordion === item.title ? "open" : "closed"}
-                      className="justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </div>
-                      <ChevronDown
-                        className={cn(
-                          "size-4 transition-transform",
-                          openAccordion === item.title && "rotate-180"
-                        )}
-                      />
-                    </SidebarMenuButton>
-                    {openAccordion === item.title && (
-                      <SidebarMenuSub>
-                        {item.subItems.map(subItem => (
-                          <SidebarMenuSubItem key={subItem.id}>
-                            <SidebarMenuSubButton asChild>
-                              <Link
-                                to={subItem.url}
-                                className={cn(
-                                  subItem.isCreate && "!text-green-600 hover:!text-green-700 font-medium"
-                                )}
-                              >
-                                {subItem.title}
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    )}
-                  </SidebarMenuItem>
-                ) : (
+              {allMenuItems.map(item => {
+                if (isAccordion(item)) {
+                  const accordionItem = item // TypeScript теперь знает, что это аккордеон
+                  return (
+                    <SidebarMenuItem key={accordionItem.title}>
+                      <SidebarMenuButton
+                        onClick={() => handleAccordionClick(accordionItem.title)}
+                        data-state={openAccordion === accordionItem.title ? "open" : "closed"}
+                        className="justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <accordionItem.icon />
+                          <span>{accordionItem.title}</span>
+                        </div>
+                        <ChevronDown
+                          className={cn(
+                            "size-4 transition-transform",
+                            openAccordion === accordionItem.title && "rotate-180"
+                          )}
+                        />
+                      </SidebarMenuButton>
+                      {openAccordion === accordionItem.title && (
+                        <SidebarMenuSub>
+                          {accordionItem.subItems.map(subItem => (
+                            <SidebarMenuSubItem key={subItem.id}>
+                              <SidebarMenuSubButton asChild>
+                                <Link
+                                  to={subItem.url}
+                                  className={cn(
+                                    subItem.isCreate && "!text-green-600 hover:!text-green-700 font-medium"
+                                  )}
+                                >
+                                  {subItem.title}
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      )}
+                    </SidebarMenuItem>
+                  )
+                }
+
+                // Обычная ссылка
+                return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <Link to={item.url}>
@@ -220,7 +252,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
-              )}
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -228,7 +260,10 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout}><LogOut /><span>Logout</span></SidebarMenuButton>
+            <SidebarMenuButton onClick={handleLogout}>
+              <LogOut />
+              <span>Logout</span>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
