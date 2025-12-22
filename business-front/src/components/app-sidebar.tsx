@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import { useBusiness } from "@/contexts/BusinessContext"
 import type { LucideIcon } from "lucide-react"
 
+// Типы
 type SidebarSubItem = {
   id: string
   title: string
@@ -27,54 +28,33 @@ type SidebarSubItem = {
   isCreate?: boolean
 }
 
-type SidebarLinkItem = {
-  title: string
-  url: string
-  icon: LucideIcon
-  type: "link"
-}
+type SidebarItem =
+  | { type: "link"; title: string; url: string; icon: LucideIcon }
+  | { type: "accordion"; title: string; icon: LucideIcon; subItems: SidebarSubItem[] }
 
-type SidebarAccordionItem = {
-  title: string
-  icon: LucideIcon
-  type: "accordion"
-  subItems: SidebarSubItem[]
-}
-
-type SidebarItem = SidebarLinkItem | SidebarAccordionItem
-
-
-const staticMenuItems: SidebarItem[] = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-    type: "link"
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-    type: "link"
-  },
-]
+// Статическое меню
+const staticMenuItems = [
+  { title: "Home", url: "/", icon: Home, type: "link" },
+  { title: "Settings", url: "/settings", icon: Settings, type: "link" },
+] as const satisfies readonly SidebarItem[]
 
 export function AppSidebar() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
-  const { business, loading, error } = useBusiness();
-  const navigate = useNavigate();
+  const { business, loading, error } = useBusiness()
+  const navigate = useNavigate()
 
   const handleAccordionClick = (title: string) => {
     setOpenAccordion(openAccordion === title ? null : title)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    navigate('/login');
-    window.location.reload();
-  };
-  const allMenuItems: SidebarItem[] = [...staticMenuItems]
-  const dynamicItems: any[] = [];
+    localStorage.removeItem('authToken')
+    navigate('/login')
+    window.location.reload()
+  }
+
+  const dynamicItems: SidebarItem[] = []
+
   if (!loading && !error && business) {
     if (business.texts) {
       dynamicItems.push({
@@ -82,20 +62,14 @@ export function AppSidebar() {
         icon: BookText,
         type: "accordion",
         subItems: [
-          {
-            id: "add-new-text",
-            title: "Add New Text",
-            url: "/create-text",
-            isCreate: true,
-          },
+          { id: "add-new-text", title: "Add New Text", url: "/create-text", isCreate: true },
           ...business.texts.map(text => ({
             id: text.id,
             title: text.name,
             url: `/texts/${text.id}`,
           })),
         ],
-
-      });
+      })
     }
 
     if (business.lists) {
@@ -105,21 +79,15 @@ export function AppSidebar() {
         type: "accordion",
         subItems: [
           { id: "add-new-list", title: "Add New List", url: "/create-list", isCreate: true },
-          ...business.lists.map(list => ({ id: list.id, title: list.name, url: `/lists/${list.id}` }))
+          ...business.lists.map(list => ({ id: list.id, title: list.name, url: `/lists/${list.id}` })),
         ],
-      });
+      })
     }
   }
 
+  const allMenuItems: SidebarItem[] = [...staticMenuItems, ...dynamicItems]
 
-  const homeIndex = allMenuItems.findIndex(item => item.title === "Home");
-  if (homeIndex !== -1) {
-    allMenuItems.splice(homeIndex + 1, 0, ...dynamicItems);
-  } else {
-    allMenuItems.unshift(...dynamicItems);
-  }
-
-
+  // Функция для отображения состояния загрузки
   if (loading) {
     return (
       <Sidebar>
@@ -128,10 +96,30 @@ export function AppSidebar() {
             <SidebarGroupLabel>Application</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem><SidebarMenuButton><Home /><span>Home</span></SidebarMenuButton></SidebarMenuItem>
-                <SidebarMenuItem><SidebarMenuSubButton><BookText /><span>Loading Texts...</span></SidebarMenuSubButton></SidebarMenuItem>
-                <SidebarMenuItem><SidebarMenuSubButton><List /><span>Loading Lists...</span></SidebarMenuSubButton></SidebarMenuItem>
-                <SidebarMenuItem><SidebarMenuButton><Settings /><span>Settings</span></SidebarMenuButton></SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuSubButton>
+                    <BookText />
+                    <span>Loading Texts...</span>
+                  </SidebarMenuSubButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuSubButton>
+                    <List />
+                    <span>Loading Lists...</span>
+                  </SidebarMenuSubButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Settings />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -147,9 +135,10 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-    );
+    )
   }
 
+  // Функция для отображения ошибки
   if (error) {
     return (
       <Sidebar>
@@ -158,9 +147,21 @@ export function AppSidebar() {
             <SidebarGroupLabel>Application</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem><SidebarMenuButton><Home /><span>Home</span></SidebarMenuButton></SidebarMenuItem>
-                <SidebarMenuItem><p className="text-red-500 p-2">Error: {error}</p></SidebarMenuItem>
-                <SidebarMenuItem><SidebarMenuButton><Settings /><span>Settings</span></SidebarMenuButton></SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <p className="text-red-500 p-2">Error: {error}</p>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Settings />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -176,9 +177,10 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-    );
+    )
   }
 
+  // Основное меню
   return (
     <Sidebar>
       <SidebarContent>
@@ -186,14 +188,12 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {allMenuItems.map((item) =>
+              {allMenuItems.map(item =>
                 item.type === "accordion" ? (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       onClick={() => handleAccordionClick(item.title)}
-                      data-state={
-                        openAccordion === item.title ? "open" : "closed"
-                      }
+                      data-state={openAccordion === item.title ? "open" : "closed"}
                       className="justify-between"
                     >
                       <div className="flex items-center gap-2">
@@ -209,14 +209,14 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                     {openAccordion === item.title && (
                       <SidebarMenuSub>
-                        {item.subItems.map((subItem: { id: string; title: string; url: string; isCreate?: boolean }) => (
+                        {item.subItems.map(subItem => (
                           <SidebarMenuSubItem key={subItem.id}>
                             <SidebarMenuSubButton asChild>
                               <Link
                                 to={subItem.url}
                                 className={cn(
                                   subItem.isCreate &&
-                                  "!text-green-600 hover:!text-green-700 font-medium"
+                                    "!text-green-600 hover:!text-green-700 font-medium"
                                 )}
                               >
                                 {subItem.title}
@@ -255,4 +255,3 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
- 
