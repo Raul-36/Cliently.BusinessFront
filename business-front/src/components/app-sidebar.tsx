@@ -44,7 +44,7 @@ type SidebarAccordionItem = {
 type SidebarItem = SidebarLinkItem | SidebarAccordionItem
 
 
-const staticMenuItems = [
+const staticMenuItems: SidebarItem[] = [
   {
     title: "Home",
     url: "/",
@@ -73,7 +73,7 @@ export function AppSidebar() {
     navigate('/login');
     window.location.reload();
   };
-  const allMenuItems = [...staticMenuItems];
+  const allMenuItems: SidebarItem[] = [...staticMenuItems]
   const dynamicItems: any[] = [];
   if (!loading && !error && business) {
     if (business.texts) {
