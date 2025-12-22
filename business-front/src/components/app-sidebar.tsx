@@ -18,6 +18,31 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { useBusiness } from "@/contexts/BusinessContext"
+import type { LucideIcon } from "lucide-react"
+
+type SidebarSubItem = {
+  id: string
+  title: string
+  url: string
+  isCreate?: boolean
+}
+
+type SidebarLinkItem = {
+  title: string
+  url: string
+  icon: LucideIcon
+  type: "link"
+}
+
+type SidebarAccordionItem = {
+  title: string
+  icon: LucideIcon
+  type: "accordion"
+  subItems: SidebarSubItem[]
+}
+
+type SidebarItem = SidebarLinkItem | SidebarAccordionItem
+
 
 const staticMenuItems = [
   {
