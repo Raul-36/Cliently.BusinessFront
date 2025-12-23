@@ -1,0 +1,31 @@
+# Ignore git and docker specific files
+.git
+.gitignore
+.dockerignore
+Dockerfile
+
+# Ignore development artifacts
+node_modules
+dist
+dist-ssr
+*.local
+.env.local
+
+# Ignore logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Ignore editor and OS-specific files
+.vscode
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

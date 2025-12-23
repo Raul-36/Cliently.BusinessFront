@@ -1,0 +1,6 @@
+services:
+  cliently-business-front:
+    image: ${DOCKER_USERNAME}/cliently-business-front:latest
+    ports:
+      - "5173:4173"
+    restart: always
