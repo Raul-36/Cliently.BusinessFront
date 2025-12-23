@@ -7,13 +7,13 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
-
-FROM node:20-alpine
-
 ARG VITE_API_GATEWAY_URL
 
 ENV VITE_API_GATEWAY_URL=$VITE_API_GATEWAY_URL
+
+RUN npm run build
+
+FROM node:20-alpine
 
 WORKDIR /app
 
