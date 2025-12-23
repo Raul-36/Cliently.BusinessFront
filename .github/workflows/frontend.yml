@@ -48,7 +48,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "."
           target: "~/business-front"
-          strip_components: 1
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
